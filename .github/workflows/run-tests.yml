@@ -18,10 +18,9 @@ jobs:
     - name: Checkout Dev Repo
       uses: actions/checkout@v4
       with:
-        repository: ${{goodoldboyyeah/SpringBootTest }}
-        ref: ${{ github.event.client_payload.dev_ref }}
-        token: ${{ secrets.ACCESS_TOKEN }}
-        # path: source-code  # 将开发代码检出到子目录
+        repository: ${{github.event.client_payload.dev_repo}}
+        ref: ${{github.event.client_payload.dev_ref}}
+        token: ${{secrets.ACCESS_TOKEN}}
 
     # 3. 设置Java环境
     - name: Set up Java
@@ -31,11 +30,11 @@ jobs:
         distribution: 'temurin'
         cache: 'maven'
 
-    # # 4. 构建开发代码（示例使用Maven）
-    # - name: Build Source Code
-    #   run: mvn clean install -DskipTests
+    - name: Build Dev Code
+      run: mvn clean install -DskipTests
+      working-directory: ./source-code  # 如果启用path参数需要取消注释
 
     # 5. 运行测试（假设测试仓库包含测试代码）
     - name: Run Tests
-      run: mvn test "-Dsurefire.suiteXmlFiles=ApiTest.xml"
+      run: mvn test "-Dsurefire.suiteXmlFiles=src/ApiTest.xml"
      
