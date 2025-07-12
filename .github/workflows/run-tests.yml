@@ -1,0 +1,41 @@
+name: Run Java Tests
+
+on:
+  # 接收来自其他仓库的触发请求
+  repository_dispatch:
+    types: [run-tests-request]
+
+jobs:
+  execute-tests:
+    runs-on: ubuntu-latest
+    
+    steps:
+    # 1. 检出测试仓库代码
+    - name: Checkout Test Repo
+      uses: actions/checkout@v4
+    
+    # 2. 检出开发仓库代码（从触发事件获取参数）
+    - name: Checkout Dev Repo
+      uses: actions/checkout@v4
+      with:
+        repository: ${{goodoldboyyeah/SpringBootTest }}
+        ref: ${{ github.event.client_payload.dev_ref }}
+        token: ${{ secrets.ACCESS_TOKEN }}
+        # path: source-code  # 将开发代码检出到子目录
+
+    # 3. 设置Java环境
+    - name: Set up Java
+      uses: actions/setup-java@v3
+      with:
+        java-version: '8'
+        distribution: 'temurin'
+        cache: 'maven'
+
+    # # 4. 构建开发代码（示例使用Maven）
+    # - name: Build Source Code
+    #   run: mvn clean install -DskipTests
+
+    # 5. 运行测试（假设测试仓库包含测试代码）
+    - name: Run Tests
+      run: mvn test "-Dsurefire.suiteXmlFiles=ApiTest.xml"
+     
